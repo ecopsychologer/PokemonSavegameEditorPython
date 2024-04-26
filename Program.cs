@@ -24,14 +24,28 @@ namespace PokemonSavegameEditor
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
+            string saveFilePath;
             if (args.Length < 1)
             {
-                Console.WriteLine("Not enough arguments provided (expected [1]: Path to Pokemon save file");
+                Console.WriteLine("No save file path provided. Please enter the path to a Pokemon save file:");
+                saveFilePath = Console.ReadLine();
+            }
+            else
+            {
+                saveFilePath = args[0];
+            }
+
+            if (!File.Exists(saveFilePath))
+            {
+                Console.WriteLine($"Save file not found at path: {saveFilePath}");
                 return;
             }
 
+            var saveFile = new SaveFile(saveFilePath);
+            Console.WriteLine(saveFile.ToString());
+            //ModifySaveFile(saveFile);
+
+            
             // These indices are declared based on the assumption that:
             // 1) The first argument contains the path to a FireRed or LeafGreen save file;
             // 2) The second argument contains the path to a Ruby or Sapphire save file;
@@ -116,6 +130,12 @@ namespace PokemonSavegameEditor
                         var metLocation = pokemon.PokemonData.Miscellaneous.MetLocation;
                         var originsInfo = pokemon.PokemonData.Miscellaneous.OriginsInfo;
                         var ivsEggAndAbility = pokemon.PokemonData.Miscellaneous.IVsEggAndAbility;
+                        var hpIV = (int)(ivsEggAndAbility & 0x1F);
+                        var atkIV = pokemon.Attack;
+                        var defIV = pokemon.Defense;
+                        var speedIV = pokemon.Speed;
+                        var spAtkIV = pokemon.SpecialAttack;
+                        var spDefIV = pokemon.SpecialDefense;
                         var ribbonsAndObedience = pokemon.PokemonData.Miscellaneous.RibbonsAndObedience;
                         var otName = StringHelper.GameStringToReadableString(pokemon.OTName, charset);
                         var nickname = StringHelper.GameStringToReadableString(pokemon.Nickname, charset);
@@ -130,6 +150,9 @@ namespace PokemonSavegameEditor
 
                         Console.WriteLine($@"Pokemon {teamPokemonCounter}: Species {species:D3}, ItemHeld {itemHeld}, Experience {experience}, PPBonuses {ppBonuses}, Friendship {friendship}, Unknown {unknown}, OTID {otID:D5}, OTName {otName}, Nickname: {nickname}");
                         Console.WriteLine($"PokerusStatus {pokerusStatus}, MetLocation {metLocation}, OriginsInfo {originsInfo}, Egg IVs/Ability {ivsEggAndAbility}, Ribbons/Obedience {ribbonsAndObedience}");
+                        Console.WriteLine($"IV's:");
+                        Console.WriteLine($"HP: {hpIV} | Attack: {atkIV} | Defense: {defIV}");
+                        Console.WriteLine($"Speed: {speedIV} | Special Attack: {spAtkIV} | Special Defense: {spDefIV}");
                         Console.WriteLine($"Moveset: Move1 {move1} PP1 {pp1}");
                         Console.WriteLine($"Moveset: Move2 {move2} PP2 {pp2}");
                         Console.WriteLine($"Moveset: Move3 {move3} PP3 {pp3}");
